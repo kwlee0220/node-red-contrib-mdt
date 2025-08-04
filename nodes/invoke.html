@@ -1,0 +1,237 @@
+<script type="text/javascript">
+    function renderVariableList(listId, hiddenId, variables) {
+        const list = document.getElementById(listId);
+        list.innerHTML = '';
+        variables.forEach((v, idx) => {
+            const li = document.createElement('li');
+            if (listId === 'node-input-inoutput-arguments-list') {
+                // 인자 목록인 경우 direction 선택 제거
+                li.innerHTML =
+                    `<input type='text' placeholder='이름' value='${v.name || ''}' style='width:100px;margin-right:5px;' onchange='updateVariableName("${listId}",${idx},this.value)'>` +
+                    `<input type='text' placeholder='argument-spec' value='${v.spec || ''}' style='width:150px;margin-right:5px;' onchange='updateVariableSpec("${listId}",${idx},this.value)'>` +
+                    `<button type='button' onclick='removeVariable("${listId}",${idx})'>삭제</button>`;
+            } else {
+                // 기존 변수 목록
+                li.innerHTML =
+                    `<input type='text' placeholder='이름' value='${v.name || ''}' style='width:100px;margin-right:5px;' onchange='updateVariableName("${listId}",${idx},this.value)'>` +
+                    `<input type='text' placeholder='variable-spec' value='${v.spec || ''}' style='width:150px;margin-right:5px;' onchange='updateVariableSpec("${listId}",${idx},this.value)'>` +
+                    `<button type='button' onclick='removeVariable("${listId}",${idx})'>삭제</button>`;
+            }
+            list.appendChild(li);
+        });
+        document.getElementById(hiddenId).value = JSON.stringify(variables);
+    }
+
+    function addInputArgument() {
+        const hidden = document.getElementById('node-input-inputArguments');
+        let arr = [];
+        try { arr = JSON.parse(hidden.value); } catch(e) {}
+        arr.push({name:'', spec:''});
+        renderVariableList('node-input-inputArguments-list', 'node-input-inputArguments', arr);
+    }
+    function addOutputArgument() {
+        const hidden = document.getElementById('node-input-outputArguments');
+        let arr = [];
+        try { arr = JSON.parse(hidden.value); } catch(e) {}
+        arr.push({name:'', spec:''});
+        renderVariableList('node-input-outputArguments-list', 'node-input-outputArguments', arr);
+    }
+    function addInoutputArgument() {
+        const hidden = document.getElementById('node-input-inoutput-arguments');
+        let arr = [];
+        try { arr = JSON.parse(hidden.value); } catch(e) {}
+        arr.push({name:'', spec:''});
+        renderVariableList('node-input-inoutput-arguments-list', 'node-input-inoutput-arguments', arr);
+    }
+    function removeVariable(listId, idx) {
+        let hiddenId;
+        if (listId === 'node-input-inputArguments-list') {
+            hiddenId = 'node-input-inputArguments';
+        } else if (listId === 'node-input-outputArguments-list') {
+            hiddenId = 'node-input-outputArguments';
+        } else if (listId === 'node-input-inoutput-arguments-list') {
+            hiddenId = 'node-input-inoutput-arguments';
+        }
+        let arr = [];
+        try { arr = JSON.parse(document.getElementById(hiddenId).value); } catch(e) {}
+        arr.splice(idx, 1);
+        renderVariableList(listId, hiddenId, arr);
+    }
+    function updateVariableName(listId, idx, value) {
+        let hiddenId;
+        if (listId === 'node-input-inputArguments-list') {
+            hiddenId = 'node-input-inputArguments';
+        } else if (listId === 'node-input-outputArguments-list') {
+            hiddenId = 'node-input-outputArguments';
+        } else if (listId === 'node-input-inoutput-arguments-list') {
+            hiddenId = 'node-input-inoutput-arguments';
+        }
+        let arr = [];
+        try { arr = JSON.parse(document.getElementById(hiddenId).value); } catch(e) {}
+        arr[idx].name = value;
+        renderVariableList(listId, hiddenId, arr);
+    }
+    function updateVariableSpec(listId, idx, value) {
+        let hiddenId;
+        if (listId === 'node-input-inputArguments-list') {
+            hiddenId = 'node-input-inputArguments';
+        } else if (listId === 'node-input-outputArguments-list') {
+            hiddenId = 'node-input-outputArguments';
+        } else if (listId === 'node-input-inoutput-arguments-list') {
+            hiddenId = 'node-input-inoutput-arguments';
+        }
+        let arr = [];
+        try { arr = JSON.parse(document.getElementById(hiddenId).value); } catch(e) {}
+        arr[idx].spec = value;
+        renderVariableList(listId, hiddenId, arr);
+    }
+
+
+    // Node-RED 에디터에서 노드 편집 시 리스트 렌더링
+    RED.nodes.registerType('invoke',{
+        category: 'MDT Platform',
+        color: '#C0DEED',
+        defaults: {
+            name: {value:""},
+            mdtEndpoint: {value:""},
+            operationRef: {value:""},
+            poll: {value:"1"},
+            timeout: {value:null},
+            inputArguments: {value:[]},
+            outputArguments: {value:[]},
+            inoutputArguments: {value:[]}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "serial in.png",
+        label: function() {
+            return this.name||"invoke";
+        },
+        oneditprepare: function() {
+            console.log("oneditprepare - this:", this);
+            console.log("oneditprepare - this.inputArguments:", this.inputArguments);
+            console.log("oneditprepare - this.outputArguments:", this.outputArguments);
+            console.log("oneditprepare - this.inoutputArguments:", this.inoutputArguments);
+            
+            // 입력 변수 목록 렌더링
+            let inputArgs = [];
+            try { 
+                inputArgs = JSON.parse(this.inputArguments || '[]'); 
+            } catch(e) { 
+                inputArgs = []; 
+            }
+            $("#node-input-inputArguments").val(JSON.stringify(inputArgs));
+            renderVariableList('node-input-inputArguments-list', 'node-input-inputArguments', inputArgs);
+            
+            // 출력 변수 목록 렌더링
+            let outputArgs = [];
+            try { 
+                outputArgs = JSON.parse(this.outputArguments || '[]'); 
+            } catch(e) { 
+                outputArgs = []; 
+            }
+            $("#node-input-outputArguments").val(JSON.stringify(outputArgs));
+            renderVariableList('node-input-outputArguments-list', 'node-input-outputArguments', outputArgs);
+            
+            // 입출력 변수 목록 렌더링
+            let inoutputArgs = [];
+            try { 
+                inoutputArgs = JSON.parse(this.inoutputArguments || '[]'); 
+            } catch(e) { 
+                inoutputArgs = []; 
+            }
+            $("#node-input-inoutput-arguments").val(JSON.stringify(inoutputArgs));
+            renderVariableList('node-input-inoutput-arguments-list', 'node-input-inoutput-arguments', inoutputArgs);
+        },
+        oneditsave: function() {
+            console.log("oneditsave - saving values...");
+            
+            // 입력 인자 목록 저장
+            let inputArgs = [];
+            try { 
+                inputArgs = JSON.parse($("#node-input-inputArguments").val() || '[]'); 
+            } catch(e) {
+                console.error("Failed to parse inputArguments:", e);
+            }
+            this.inputArguments = JSON.stringify(inputArgs);
+            console.log("oneditsave - this.inputArguments:", this.inputArguments);
+            
+            // 출력 인자 목록 저장
+            let outputArgs = [];
+            try { 
+                outputArgs = JSON.parse($("#node-input-outputArguments").val() || '[]'); 
+            } catch(e) {
+                console.error("Failed to parse outputArguments:", e);
+            }
+            this.outputArguments = JSON.stringify(outputArgs);
+            console.log("oneditsave - this.outputArguments:", this.outputArguments);
+            
+            // 입출력 인자 목록 저장
+            let inoutputArgs = [];
+            try { 
+                inoutputArgs = JSON.parse($("#node-input-inoutput-arguments").val() || '[]'); 
+            } catch(e) {
+                console.error("Failed to parse inoutputArguments:", e);
+            }
+            this.inoutputArguments = JSON.stringify(inoutputArgs);
+            console.log("oneditsave - this.inoutputArguments:", this.inoutputArguments);
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="invoke">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mdtEndpoint"><i class="fa fa-globe"></i> MDTPlatform Endpoint</label>
+        <input type="text" id="node-input-mdtEndpoint" placeholder="https://api.mdtplatform.com">
+        <div class="form-tip">환경 변수 MDT_ENDPOINT가 설정되어 있으면 자동으로 사용됩니다.</div>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-operationRef"><i class="fa fa-link"></i> 연산 참조 <span style="color: red;">*</span></label>
+        <input type="text" id="node-input-operationRef" placeholder="<instanceId>:<operation-path>" required>
+    </div>
+    <div class="form-row">
+        <label for="node-input-poll"><i class="fa fa-clock-o"></i> Polling (초)</label>
+        <input type="text" id="node-input-poll" placeholder="1.0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-timeout"><i class="fa fa-hourglass-end"></i> Timeout (초)</label>
+        <input type="text" id="node-input-timeout" placeholder="null">
+    </div>
+    <div class="form-row">
+        <label><i class="fa fa-sign-in"></i> 입력 인자 목록</label>
+        <ol id="node-input-inputArguments-list" style="padding-left:20px;"></ol>
+        <input type="hidden" id="node-input-inputArguments">
+        <button type="button" onclick="addInputArgument()">추가</button>
+    </div>
+    <div class="form-row">
+        <label><i class="fa fa-sign-out"></i> 출력 인자 목록</label>
+        <ol id="node-input-outputArguments-list" style="padding-left:20px;"></ol>
+        <input type="hidden" id="node-input-outputArguments">
+        <button type="button" onclick="addOutputArgument()">추가</button>
+    </div>
+    <div class="form-row">
+        <label><i class="fa fa-exchange"></i> 입출력 인자 목록</label>
+        <ol id="node-input-inoutput-arguments-list" style="padding-left:20px;"></ol>
+        <input type="hidden" id="node-input-inoutput-arguments">
+        <button type="button" onclick="addInoutputArgument()">추가</button>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="invoke">
+    <p>HTTP 기반 Task를 수행하는 노드입니다.</p>
+    <h3>설정</h3>
+    <ul>
+        <li><b>MDTPlatform Endpoint</b>: MDT Platform API 엔드포인트 URL (환경 변수 MDT_ENDPOINT 사용 가능)</li>
+        <li><b>연산 참조</b>: 연산 참조 (필수)</li>
+        <li><b>Poll</b>: Task 동작 점검 시간 간격 (기본값 1.0)</li>
+        <li><b>Timeout</b>: Task 실행 제한 시간 (기본값 null)</li>
+        <li><b>입력 인자 목록</b>: (name, variable-spec) 리스트</li>
+        <li><b>출력 인자 목록</b>: (name, variable-spec) 리스트</li>
+        <li><b>입출력 인자 목록</b>: (name, argument-spec) 리스트</li>
+    </ul>
+</script> 

@@ -1,0 +1,123 @@
+<script type="text/javascript">
+    RED.nodes.registerType('upload file',{
+        category: 'MDT Platform',
+        color: '#C0DEED',
+        defaults: {
+            name: {value:""},
+            mdtEndpoint: {value:""},
+            reference: {value:""},
+            filePath: {value:""},
+            mimeType: {value:undefined}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"upload file";
+        },
+        oneditprepare: function() {
+            // 파일 선택 버튼 이벤트
+            $("#node-input-fileBrowse").click(function() {
+                $("#node-input-fileInput").click();
+            });
+            
+            // 파일 경로 입력 필드에 도움말 추가
+            $("#node-input-filePath").attr("title", "전체 파일 경로를 입력하거나 파일 선택 버튼을 사용하세요. 예: /home/user/file.txt 또는 C:\\Users\\user\\file.txt");
+            
+            // 파일 선택 시 경로 설정
+            $("#node-input-fileInput").change(function() {
+                const file = this.files[0];
+                if (file) {
+                    // 파일의 전체 경로를 설정
+                    // 브라우저에서는 보안상 전체 경로를 직접 가져올 수 없지만,
+                    // Node-RED 환경에서는 사용자가 전체 경로를 입력할 수 있도록 안내
+                    const fileName = file.name;
+                    
+                    // 현재 입력된 경로가 있으면 디렉토리 부분을 유지하고 파일명만 교체
+                    const currentPath = $("#node-input-filePath").val();
+                    let fullPath = fileName;
+                    
+                    if (currentPath && currentPath.includes('/')) {
+                        // 기존 경로에서 디렉토리 부분 추출
+                        const lastSlashIndex = currentPath.lastIndexOf('/');
+                        const directory = currentPath.substring(0, lastSlashIndex + 1);
+                        fullPath = directory + fileName;
+                    } else if (currentPath && currentPath.includes('\\')) {
+                        // Windows 경로인 경우
+                        const lastBackslashIndex = currentPath.lastIndexOf('\\');
+                        const directory = currentPath.substring(0, lastBackslashIndex + 1);
+                        fullPath = directory + fileName;
+                    }
+                    
+                    $("#node-input-filePath").val(fullPath);
+                    
+                    // 파일 확장자에 따른 MIME 타입 자동 설정
+                    const ext = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
+                    const mimeTypes = {
+                        '.jpg': 'image/jpeg',
+                        '.jpeg': 'image/jpeg', 
+                        '.png': 'image/png',
+                        '.gif': 'image/gif',
+                        '.pdf': 'application/pdf',
+                        '.doc': 'application/msword',
+                        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        '.xls': 'application/vnd.ms-excel',
+                        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        '.txt': 'text/plain',
+                        '.csv': 'text/csv'
+                    };
+                    
+                    if (mimeTypes[ext]) {
+                        $("#node-input-mimeType").val(mimeTypes[ext]);
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="upload file">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mdtEndpoint"><i class="fa fa-globe"></i> MDTPlatform Endpoint</label>
+        <input type="text" id="node-input-mdtEndpoint" placeholder="https://api.mdtplatform.com">
+    </div>
+    <div class="form-row">
+        <label for="node-input-reference"><i class="fa fa-link"></i> Reference</label>
+        <input type="text" id="node-input-reference" placeholder="reference-value" required>
+    </div>
+    <div class="form-row">
+        <label for="node-input-filePath"><i class="fa fa-file"></i> File Path</label>
+        <input type="text" id="node-input-filePath" placeholder="파일의 전체 경로를 입력하거나 선택하세요" style="width: 70%;">
+        <button type="button" id="node-input-fileBrowse" style="width: 25%; margin-left: 5%;">파일 선택</button>
+        <input type="file" id="node-input-fileInput" style="display: none;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mimeType"><i class="fa fa-arrow-down"></i> MIME Type</label>
+        <input type="text" id="node-input-mimeType" placeholder="자동 감지 또는 직접 입력">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="upload file">
+    <p>MDT Platform에서 파일을 업로드하는 노드입니다.</p>
+    
+    <h3>설정</h3>
+    <dl class="message-properties">
+        <dt>MDTPlatform Endpoint <span class="property-type">string</span></dt>
+        <dd>MDT Platform API 엔드포인트 URL. 환경 변수 MDT_ENDPOINT가 설정되어 있으면 자동으로 사용됩니다.</dd>
+        
+        <dt>Reference <span class="property-type">string</span> <span style="color: red;">필수</span></dt>
+        <dd>업로드할 파일의 참조 경로</dd>
+        
+        <dt>File Path <span class="property-type">string</span> <span style="color: red;">필수</span></dt>
+        <dd>업로드할 로컬 파일의 전체 경로를 입력하거나 파일 선택 버튼을 사용합니다. 
+        파일 선택 시 기존 경로의 디렉토리 부분을 유지하고 파일명만 교체됩니다. 
+        예: /home/user/file.txt 또는 C:\Users\user\file.txt</dd>
+        
+        <dt>MIME Type <span class="property-type">string</span></dt>
+        <dd>업로드할 파일의 MIME 타입. 비워두면 파일 확장자에 따라 자동으로 감지됩니다.</dd>
+    </dl>
+</script> 

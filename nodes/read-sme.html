@@ -1,0 +1,68 @@
+<script type="text/javascript">
+    RED.nodes.registerType('read sme',{
+        category: 'MDT Platform',
+        color: '#C0DEED',
+        defaults: {
+            name: {value:""},
+            mdtEndpoint: {value:""},
+            reference: {value:""},
+            outputType: {value:"element"}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "http in.png",
+        label: function() {
+            return this.name||"read sme";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="read sme">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mdtEndpoint"><i class="fa fa-globe"></i> MDTPlatform Endpoint</label>
+        <input type="text" id="node-input-mdtEndpoint" placeholder="https://api.mdtplatform.com">
+    </div>
+    <div class="form-row">
+        <label for="node-input-reference"><i class="fa fa-link"></i> Reference <span style="color: red;">*</span></label>
+        <input type="text" id="node-input-reference" placeholder="msg.payload.reference (default)" required>
+    </div>
+    <div class="form-row">
+        <label for="node-input-outputType"><i class="fa fa-arrow-down"></i> Output Type</label>
+        <select id="node-input-outputType">
+            <option value="element">element</option>
+            <option value="value">value</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="read sme">
+    <p>MDT Platform에서 특정 SubmodelElement를 읽어오는 노드입니다.</p>
+    
+    <h3>설정</h3>
+    <dl class="message-properties">
+        <dt>MDTPlatform Endpoint <span class="property-type">string</span></dt>
+        <dd>MDT Platform API 엔드포인트 URL. 환경 변수 MDT_ENDPOINT가 설정되어 있으면 자동으로 사용됩니다.</dd>
+        
+        <dt>Reference <span class="property-type">string</span></dt>
+        <dd>읽을 SubmodelElement의 Reference. 메시지 페이로드의 reference 필드 값이 있으면 이를 우선적으로 사용합니다.</dd>
+        
+        <dt>Output Type <span class="property-type">string</span></dt>
+        <dd>
+            출력 형식 선택:
+            <ul>
+                <li><code>element</code>: 전체 응답 데이터 반환</li>
+                <li><code>value</code>: response.baseEndpoint 값만 반환</li>
+            </ul>
+        </dd>
+    </dl>
+    
+    <h3>동작</h3>
+    <p>노드가 실행되면 다음 URL로 HTTP GET 요청을 수행합니다:</p>
+    <pre><code>{MDTPlatform endpoint}/instance-manager/instances/{Reference}</code></pre>
+    
+    <p>응답에서 <code>response.baseEndpoint</code> 값이 null이거나 존재하지 않으면 오류를 발생시킵니다.</p>
+</script> 

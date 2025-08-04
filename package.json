@@ -1,0 +1,32 @@
+{
+  "name": "node-red-contrib-mdt",
+  "version": "1.0.0",
+  "description": "Node-RED nodes for MDT Platform",
+  "keywords": [
+    "node-red",
+    "mdt"
+  ],
+  "node-red": {
+    "nodes": {
+      "read sme": "nodes/read-sme.js",
+      "read mdtmodel": "nodes/read-mdtmodel.js",
+      "update sme": "nodes/update-sme.js",
+      "task http": "nodes/task-http.js",
+      "invoke": "nodes/invoke.js",
+      "upload file": "nodes/upload-file.js",
+      "download file": "nodes/download-file.js"
+    }
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "node-red": "^3.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,67 @@
+<script type="text/javascript">
+    RED.nodes.registerType('update sme',{
+        category: 'MDT Platform',
+        color: '#C0DEED',
+        defaults: {
+            name: {value:""},
+            mdtEndpoint: {value:""},
+            reference: {value:""},
+            value: {value:""},
+            valueType: {value:"value"}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "http in.png",
+        label: function() {
+            return this.name||"update sme";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="update sme">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mdtEndpoint"><i class="fa fa-globe"></i> MDTPlatform Endpoint</label>
+        <input type="text" id="node-input-mdtEndpoint" placeholder="https://api.mdtplatform.com">
+    </div>
+    <div class="form-row">
+        <label for="node-input-reference"><i class="fa fa-link"></i> Reference</label>
+        <input type="text" id="node-input-reference" placeholder="reference-value" required>
+    </div>
+    <div class="form-row">
+        <label for="node-input-value"><i class="fa fa-link"></i> Value</label>
+        <input type="text" id="node-input-value" placeholder="element-value" required>
+    </div>
+    <div class="form-row">
+        <label for="node-input-valueType"><i class="fa fa-arrow-down"></i> Value Type <span style="color: red;">*</span></label>
+        <select id="node-input-valueType">
+            <option value="element">element</option>
+            <option value="value">value</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="update sme">
+    <p>MDT Platform에서 특정 인스턴스의 요소 정보를 가져오는 노드입니다.</p>
+    
+    <h3>설정</h3>
+    <dl class="message-properties">
+        <dt>MDTPlatform Endpoint <span class="property-type">string</span></dt>
+        <dd>MDT Platform API 엔드포인트 URL. 환경 변수 MDT_ENDPOINT가 설정되어 있으면 자동으로 사용됩니다.</dd>
+        
+        <dt>Value <span class="property-type">string</span> <span style="color: red;">필수</span></dt>
+        <dd>참조할 요소의 식별자</dd>
+        
+        <dt>Output Type <span class="property-type">string</span></dt>
+        <dd>
+            출력 형식 선택:
+            <ul>
+                <li><code>element</code>: 전체 응답 데이터 반환</li>
+                <li><code>value</code>: response.baseEndpoint 값만 반환</li>
+            </ul>
+        </dd>
+    </dl>
+</script> 
