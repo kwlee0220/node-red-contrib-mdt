@@ -16,8 +16,8 @@ function handleInput(msg, config, node) {
     }
     const outputType = config.outputType || 'value';
 
-    node.status({fill:"green", shape:"dot", text:"Reading SubmodelElement"});
-    node.log(`Reading SubmodelElement: ref=${reference}`);
+    // node.status({fill:"green", shape:"dot", text:"Reading SubmodelElement"});
+    // node.log(`Reading SubmodelElement: ref=${reference}`);
     const promise = ( outputType === 'value' )
                     ? manager.readElementValue(reference)
                     : manager.readElement(reference);
@@ -26,7 +26,6 @@ function handleInput(msg, config, node) {
         msg.payload = response;
         node.send(msg);
 
-        node.log("요청이 성공적으로 완료되었습니다.");
         node.status({});
     }).catch(error => { 
         handleRequestError(error, node);

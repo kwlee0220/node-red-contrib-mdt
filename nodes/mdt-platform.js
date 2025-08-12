@@ -24,6 +24,32 @@ class MDTInstanceManager {
         this.node = node;
     }
 
+    async getInstanceAll() {
+        const reqUrl = `${this.mdtEndpoint}/instance-manager/instances`;
+        this.node.log(`GET instance all: requestUrl=${reqUrl}`);
+        const response = await axios.get(reqUrl);
+        return response.data;
+    }
+
+    async getInstance(instanceId) {
+        const reqUrl = `${this.mdtEndpoint}/instance-manager/instances/${instanceId}`;
+        const response = await axios.get(reqUrl);
+        return response.data;
+    }
+
+    async setInstanceStatus(instanceId, isRunning) {
+        const cmd = isRunning ? "start" : "stop";
+        const reqUrl = `${this.mdtEndpoint}/instance-manager/instances/${instanceId}/${cmd}`;
+        this.node.log(`PUT instance: requestUrl=${reqUrl}`);
+        const response = await axios.put(reqUrl);
+        return response.data;
+    }
+
+    async removeInstance(instanceId) {
+        const reqUrl = `${this.mdtEndpoint}/instance-manager/instances/${instanceId}`;
+        await axios.delete(reqUrl);
+    }
+
     /**
      * Element Reference를 해석하여 요청 URL을 반환
      * @param {string} reference - Element Reference

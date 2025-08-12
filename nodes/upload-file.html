@@ -87,12 +87,23 @@
     </div>
     <div class="form-row">
         <label for="node-input-reference"><i class="fa fa-link"></i> Reference</label>
-        <input type="text" id="node-input-reference" placeholder="reference-value" required>
+        <input type="text" id="node-input-reference"
+                placeholder="message.payload.reference 또는 reference-value" required>
     </div>
     <div class="form-row">
         <label for="node-input-filePath"><i class="fa fa-file"></i> File Path</label>
-        <input type="text" id="node-input-filePath" placeholder="파일의 전체 경로를 입력하거나 선택하세요" style="width: 70%;">
+        <input type="text" id="node-input-filePath" 
+                placeholder="message.payload.filePath 또는 입력된 파일의 전체 경로"
+                style="width: 70%;">
         <button type="button" id="node-input-fileBrowse" style="width: 25%; margin-left: 5%;">파일 선택</button>
+        <input type="file" id="node-input-fileInput" style="display: none;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mimeType"><i class="fa fa-arrow-down"></i> MIME Type</label>
+        <input type="text" id="node-input-mimeType"
+                placeholder="message.payload.mimeType, 직접 입력, 또는 자동 감지">
+    </div>
+</script> 
         <input type="file" id="node-input-fileInput" style="display: none;">
     </div>
     <div class="form-row">

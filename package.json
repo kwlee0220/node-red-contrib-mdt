@@ -8,6 +8,9 @@
   ],
   "node-red": {
     "nodes": {
+      "get instance": "nodes/get-instance.js",
+      "list instances": "nodes/list-instances.js",
+      "set instance status": "nodes/set-instance-status.js",
       "read sme": "nodes/read-sme.js",
       "read mdtmodel": "nodes/read-mdtmodel.js",
       "update sme": "nodes/update-sme.js",
